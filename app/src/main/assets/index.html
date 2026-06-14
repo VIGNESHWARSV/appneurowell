@@ -1,0 +1,1914 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NeuroWell AI - Serenity SPA</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        window.navigate = function(targetId) {
+            console.log("Navigating to:", targetId);
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            const target = document.getElementById('view-' + targetId);
+            if(target) target.classList.add('active');
+            
+            // Trigger dashboard metrics when opening the dashboard
+            if(targetId === '16-dashboard-main' && window.fetchDashboardMetrics) {
+                window.fetchDashboardMetrics();
+            }
+            
+            // Auto-initialize biometrics based on view
+            if(targetId === '8-biometric-login' && window.setupFingerprint) window.setupFingerprint();
+            if(targetId === '22-voice-input' && window.setupVoice) window.setupVoice();
+            if(targetId === '25-face-scan' && window.setupCamera) window.setupCamera();
+            if(targetId === '28-combined-analysis' && window.startMultimodalSync) window.startMultimodalSync();
+            if(targetId === '52-fingerprint-scan' && window.setupFingerprintScan) window.setupFingerprintScan();
+            
+            // Highlight active nav item
+            document.querySelectorAll('.nav-item').forEach(item => {
+                if(item.getAttribute('data-target') === targetId) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+
+            const bottomNav = document.getElementById('bottom-nav');
+            if(bottomNav) {
+                const hideNavScreens = ['1-splash', '2-welcome', '3-login', '4-signup', '5-otp', '6-forgot-password', '7-reset-password', '8-biometric-login', 
+                                         '9-onboarding-1', '10-onboarding-2', '11-onboarding-3', '12-user-info', '13-questionnaire', '14-goals', '15-notifications',
+                                         '22-voice-input', '23-voice-recording', '24-voice-processing', '42-chat-conversation', '51-subscription-plans',
+                                         '52-fingerprint-scan', '55-biometric-result'];
+                bottomNav.style.display = hideNavScreens.includes(targetId) ? 'none' : 'flex';
+            }
+            // Show/hide SOS FAB
+            const sosFab = document.getElementById('sos-fab');
+            const loggedInViews = ['16-dashboard-main','21-emotion-home','29-insights-overview','41-chat-home','50-profile-settings',
+                '71-mood-forecast','72-wellness-score','73-voice-journal','74-burnout-detector','75-wellness-planner',
+                '76-music-therapy','78-emotional-analytics','31-weekly-trends','32-monthly-analytics','33-stress-breakdown',
+                '34-trigger-detection','46-wellness-suggestions','47-meditation-player','48-breathing-exercise','60-private-mentor'];
+            if(sosFab && loggedInViews.includes(targetId)) {
+                sosFab.style.display = 'flex';
+            } else if(sosFab) {
+                sosFab.style.display = 'none';
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div id="app">
+        <div class="shape-3"></div>
+        
+        <!-- Music Control -->
+        <div id="music-control" onclick="toggleMusic()">
+            <span id="music-icon">🎵</span>
+        </div>
+
+        <audio id="bg-music" loop>
+            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
+        </audio>
+
+        <div id="view-1-splash" class="view active">
+
+            <div class="logo-container mx-auto mt-8 mb-4" onclick="navigate('2-welcome')">
+                <img class="logo-icon" src="logo.png"
+                    style="border-radius:50%; object-fit:cover; padding:5px; background:var(--glass-bg);">
+            </div>
+            <h1 class="text-center">NeuroWell <span class="text-gradient">AI</span></h1>
+            <p class="text-center text-muted mt-2">Harmonizing Mind & Environment</p>
+            <div class="glass-card mt-8 mx-auto" style="width: 80%; text-align: center;">
+                <p class="text-muted" style="font-size: 0.8rem;">Featuring Exclusive:</p>
+                <p class="text-primary mt-2">✦ Subconscious Biometric Sync</p>
+                <p class="text-primary mt-2">✦ Neural-Acoustic Therapy</p>
+                <p class="text-primary mt-2">✦ Ambient Environment Engine</p>
+                <a href="#" onclick="navigate('2-welcome'); return false;" class="text-muted mt-4 d-block" style="font-size: 0.7rem; text-decoration: underline;">Stuck? Click here to enter</a>
+            </div>
+
+            <!-- Social Links -->
+            <div class="social-links">
+                <a href="https://instagram.com" target="_blank" class="social-icon instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://wa.me/" target="_blank" class="social-icon whatsapp"><i class="fab fa-whatsapp"></i></a>
+                <a href="https://facebook.com" target="_blank" class="social-icon facebook"><i class="fab fa-facebook"></i></a>
+            </div>
+
+        </div>
+
+        <div id="view-2-welcome" class="view">
+
+            <div class="header">
+                <h2>Welcome to Serenity</h2>
+            </div>
+            <div class="glass-card mt-8 text-center"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <p class="mb-4">Your private space for gentle emotional intelligence.</p>
+                <button class="btn btn-primary mb-4" onclick="navigate('3-login')">Login</button>
+                <button class="btn btn-glass" onclick="navigate('4-signup')">Sign Up</button>
+            </div>
+
+        </div>
+
+        <div id="view-3-login" class="view">
+            <div class="header">
+                <button class="back-btn" onclick="navigate('2-welcome')">←</button>
+                <h2>Login</h2>
+                <div></div>
+            </div>
+            <div class="glass-card mt-4" style="flex:1;">
+                <input type="email" id="login-email" class="input-field mb-4" placeholder="Email">
+                <input type="password" id="login-password" class="input-field mb-4" placeholder="Password">
+                <button class="btn btn-primary w-100" id="login-btn">Sign In</button>
+                <a href="#" class="d-block mt-4 text-primary" onclick="navigate('8-biometric-login'); return false;">Use Face ID / Fingerprint</a>
+            </div>
+        </div>
+        <div id="view-4-signup" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Signup</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <img src="logo.png" class="logo-icon mx-auto mb-4"
+                    style="width:60px; height:60px; border-radius:50%;">
+                <h3>Create Account</h3>
+                <div class="text-left mt-4" style="width: 100%;">
+                    <input type="text" id="signup-name" class="input-field mb-4" placeholder="Full Name">
+                    <input type="email" id="signup-email" class="input-field mb-4" placeholder="Email">
+                    <input type="password" id="signup-password" class="input-field mb-4" placeholder="Password">
+                    <button id="signup-btn" class="btn btn-primary w-100">Sign Up</button>
+                </div>
+                <p class="text-muted mt-4" style="font-size: 0.8rem;">By signing up, you agree to our Privacy Policy.</p>
+            </div>
+
+        </div>
+
+        <div id="view-5-otp" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>OTP Verification</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <img src="logo.png" class="logo-icon mx-auto mb-4"
+                    style="width:60px; height:60px; opacity:0.5; filter: grayscale(1); border-radius:50%;">
+                <h3>OTP Verification</h3>
+                <p class="text-muted mt-4">Screen template resting peacefully.</p>
+            </div>
+
+        </div>
+
+        <div id="view-6-forgot-password" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Forgot Password</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <img src="logo.png" class="logo-icon mx-auto mb-4"
+                    style="width:60px; height:60px; border-radius:50%;">
+                <h3>Reset Password</h3>
+                <p class="text-muted mt-2 mb-6">Enter your email and we'll send you a link to reset your password.</p>
+                <input type="email" id="forgot-email" class="input-field mb-4" placeholder="Email Address">
+                <button id="forgot-btn" class="btn btn-primary w-100">Send Reset Link</button>
+            </div>
+
+        </div>
+
+        <div id="view-7-reset-password" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Reset Password</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <img src="logo.png" class="logo-icon mx-auto mb-4"
+                    style="width:60px; height:60px; opacity:0.5; filter: grayscale(1); border-radius:50%;">
+                <h3>Reset Password</h3>
+                <p class="text-muted mt-4">Screen template resting peacefully.</p>
+            </div>
+
+        </div>
+
+        <div id="view-8-biometric-login" class="view">
+            <div class="header">
+                <button class="back-btn" onclick="navigate('3-login')">←</button>
+                <h2>Biometric Login</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+                <div id="fingerprint-btn" class="logo-icon mx-auto mb-4"
+                    style="font-size:3rem; cursor:pointer; filter:none; opacity:1; width:100px; height:100px;">👆</div>
+                <h3>Fingerprint / Face ID</h3>
+                <p class="text-muted mt-4" id="webauthn-status">Tap the icon to authenticate securely via WebAuthn.</p>
+            </div>
+        </div>
+        <div id="view-9-onboarding-1" class="view">
+
+            <div class="header">
+                <h2>Onboarding 1 (Intro)</h2>
+            </div>
+            <div class="glass-card text-center"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <h3 class="mb-4">Step 1</h3>
+                <p class="text-muted mb-8">We are setting up your personalized environmental and biometric baseline.</p>
+                <button class="btn btn-primary" onclick="navigate('10-onboarding-2')">Continue Gently</button>
+            </div>
+
+        </div>
+
+        <div id="view-10-onboarding-2" class="view">
+
+            <div class="header">
+                <h2>Onboarding 2 (Features)</h2>
+            </div>
+            <div class="glass-card text-center"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <h3 class="mb-4">Step 2</h3>
+                <p class="text-muted mb-8">We are setting up your personalized environmental and biometric baseline.</p>
+                <button class="btn btn-primary" onclick="navigate('11-onboarding-3')">Continue Gently</button>
+            </div>
+
+        </div>
+
+        <div id="view-11-onboarding-3" class="view">
+
+            <div class="header">
+                <h2>Onboarding 3 (Privacy)</h2>
+            </div>
+            <div class="glass-card text-center"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <h3 class="mb-4">Step 3</h3>
+                <p class="text-muted mb-8">We are setting up your personalized environmental and biometric baseline.</p>
+                <button class="btn btn-primary" onclick="navigate('12-user-info')">Continue Gently</button>
+            </div>
+
+        </div>
+
+        <div id="view-12-user-info" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>User Info Form</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <img src="logo.png" class="logo-icon mx-auto mb-4"
+                    style="width:60px; height:60px; border-radius:50%;">
+                <h3>Complete Your Profile</h3>
+                <div class="text-left mt-4" style="width: 100%;">
+                    <label class="text-muted" style="font-size: 0.8rem; margin-left: 10px;">Age</label>
+                    <input type="number" id="profile-age" class="input-field mb-4" placeholder="Age">
+                    
+                    <label class="text-muted" style="font-size: 0.8rem; margin-left: 10px;">Gender</label>
+                    <select id="profile-gender" class="input-field mb-4" style="appearance: none;">
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                        <option value="prefer-not-to-say">Prefer not to say</option>
+                    </select>
+                    
+                    <button id="profile-save-btn" class="btn btn-primary w-100">Save & Continue</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="view-13-questionnaire" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Mental Health Questionnaire</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <h3>Current State</h3>
+                <p class="text-muted mb-6">How are you feeling right now?</p>
+                
+                <div class="text-left" style="width: 100%;">
+                    <p class="mb-2" style="font-size: 0.9rem;">Stress Level (1-10)</p>
+                    <input type="range" id="q-stress" min="1" max="10" value="5" class="w-100 mb-4">
+                    
+                    <p class="mb-2" style="font-size: 0.9rem;">Sleep Quality (1-10)</p>
+                    <input type="range" id="q-sleep" min="1" max="10" value="7" class="w-100 mb-4">
+                    
+                    <p class="mb-2" style="font-size: 0.9rem;">Mood Score (1-10)</p>
+                    <input type="range" id="q-mood" min="1" max="10" value="6" class="w-100 mb-4">
+                    
+                    <p class="mb-2" style="font-size: 0.9rem;">Anxiety Level (1-10)</p>
+                    <input type="range" id="q-anxiety" min="1" max="10" value="3" class="w-100 mb-6">
+                    
+                    <button id="q-save-btn" class="btn btn-primary w-100">Submit Assessment</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="view-14-goals" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Goal Selection</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <h3>Personal Goals</h3>
+                <p class="text-muted mb-6">What would you like to focus on?</p>
+                
+                <div class="goals-selection text-left" style="width: 100%;">
+                    <label class="glass-card mb-3 d-flex align-items-center" style="display: flex; align-items: center; padding: 12px; cursor: pointer;">
+                        <input type="checkbox" name="goal" value="Reduce Stress" style="margin-right: 12px; width: 20px; height: 20px;">
+                        <span>Reduce Stress</span>
+                    </label>
+                    <label class="glass-card mb-3 d-flex align-items-center" style="display: flex; align-items: center; padding: 12px; cursor: pointer;">
+                        <input type="checkbox" name="goal" value="Improve Sleep" style="margin-right: 12px; width: 20px; height: 20px;">
+                        <span>Improve Sleep</span>
+                    </label>
+                    <label class="glass-card mb-3 d-flex align-items-center" style="display: flex; align-items: center; padding: 12px; cursor: pointer;">
+                        <input type="checkbox" name="goal" value="Track Mood" style="margin-right: 12px; width: 20px; height: 20px;">
+                        <span>Track Mood</span>
+                    </label>
+                    <label class="glass-card mb-3 d-flex align-items-center" style="display: flex; align-items: center; padding: 12px; cursor: pointer;">
+                        <input type="checkbox" name="goal" value="Better Focus" style="margin-right: 12px; width: 20px; height: 20px;">
+                        <span>Better Focus</span>
+                    </label>
+                    
+                    <button id="goals-save-btn" class="btn btn-primary w-100 mt-4">Confirm Goals</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="view-15-notifications" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Notification Preferences</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <h3>Reminders</h3>
+                <p class="text-muted mb-6">Stay connected with your progress.</p>
+                
+                <div class="notifications-settings text-left" style="width: 100%;">
+                    <label class="glass-card mb-3 d-flex align-items-center" style="display: flex; align-items: center; padding: 12px; justify-content: space-between;">
+                        <span>Daily Reminder</span>
+                        <input type="checkbox" id="pref-daily" checked style="width: 20px; height: 20px;">
+                    </label>
+                    <label class="glass-card mb-3 d-flex align-items-center" style="display: flex; align-items: center; padding: 12px; justify-content: space-between;">
+                        <span>Weekly Report</span>
+                        <input type="checkbox" id="pref-weekly" checked style="width: 20px; height: 20px;">
+                    </label>
+                    <label class="glass-card mb-3 d-flex align-items-center" style="display: flex; align-items: center; padding: 12px; justify-content: space-between;">
+                        <span>Meditation Reminder</span>
+                        <input type="checkbox" id="pref-meditation" style="width: 20px; height: 20px;">
+                    </label>
+                    
+                    <button id="prefs-save-btn" class="btn btn-primary w-100 mt-4">All Set!</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="view-16-dashboard-main" class="view">
+            <div class="header">
+                <div>
+                    <h2>Hello, Alex</h2>
+                    <p class="text-muted" id="greeting-subtext">A calm afternoon awaits.</p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div class="badge" style="background: rgba(24, 112, 244, 0.1); color: var(--primary); border: 1px solid var(--primary-light); font-size: 0.6rem;">🛡️ Privacy Protected</div>
+                    <div class="avatar" onclick="navigate('50-profile-settings')">A</div>
+                </div>
+            </div>
+
+            <div class="glass-card text-center mb-4" style="position:relative; padding-top:30px; padding-bottom:30px;">
+                <div class="bg-pulse"></div>
+                <h3 class="mb-2" style="position:relative; z-index:2;">Resonance Score</h3>
+                <div class="mood-score text-gradient mb-2" id="dash-score"
+                    style="font-size: 4.5rem; font-weight: 300; position:relative; z-index:2; line-height:1.1;">--</div>
+                <p class="text-primary" id="dash-state"
+                    style="font-weight: 500; position:relative; z-index:2; letter-spacing:1px; margin-top:8px;">
+                    ANALYZING...</p>
+                <p class="text-muted mt-2" id="dash-vagus" style="font-size: 0.8rem; position:relative; z-index:2;">
+                    Syncing with biometric sensors.</p>
+            </div>
+
+            <div style="position:relative; z-index:50; margin-top: 32px;">
+                <h4 class="mb-4" style="font-size: 1.1rem; color:var(--text-main); font-weight:700;">Quick Interventions</h4>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:20px;">
+                    <div class="glass-card text-center p-5" onclick="navigate('60-private-mentor')" style="cursor: pointer; border: 2px solid var(--primary); background: white; box-shadow: 0 10px 25px rgba(24, 112, 244, 0.15);">
+                        <div style="font-size: 2rem; margin-bottom: 12px;">🧘</div>
+                        <div style="font-weight: bold; font-size: 0.9rem; color: var(--primary);">Private Mentor</div>
+                    </div>
+                    <div class="glass-card text-center p-5" onclick="navigate('21-emotion-home')" style="cursor: pointer; border: 2px solid var(--accent); background: white; box-shadow: 0 10px 25px rgba(255, 209, 59, 0.15);">
+                        <div style="font-size: 2rem; margin-bottom: 12px;">🧪</div>
+                        <div style="font-weight: bold; font-size: 0.9rem; color: var(--secondary);">Start Analysis</div>
+                    </div>
+                </div>
+
+                <!-- AI FEATURES GRID -->
+                <h4 class="mb-3" style="font-size: 1.1rem; color:var(--text-main); font-weight:700;">✦ AI Wellness Suite</h4>
+                <div class="feature-grid" id="nw-feature-grid">
+                    <!-- Rendered by NW_renderDashboardCards() in features.js -->
+                    <div class="feature-card fc-green shimmer" style="height:85px;"></div>
+                    <div class="feature-card fc-blue shimmer" style="height:85px;"></div>
+                    <div class="feature-card fc-amber shimmer" style="height:85px;"></div>
+                    <div class="feature-card fc-purple shimmer" style="height:85px;"></div>
+                    <div class="feature-card fc-teal shimmer" style="height:85px;"></div>
+                    <div class="feature-card fc-red shimmer" style="height:85px;"></div>
+                </div>
+            </div>
+
+            <!-- MOOD RECOMMENDATIONS -->
+            <div class="glass-card mb-8" id="mood-recs-card" style="display: none; position:relative; z-index:50; border-top: 5px solid var(--primary); background: white;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 style="font-size:1.1rem; font-weight:700;">✦ Harmonic Mix</h4>
+                    <span id="rec-mood-label" class="badge bg-primary" style="padding: 8px 16px; border-radius: 20px; font-weight:bold;">Balanced</span>
+                </div>
+                <div id="recommendations-list"></div>
+            </div>
+
+            <div class="glass-card mb-4" style="padding: 16px;">
+                <h4 class="mb-2" style="font-size:0.95rem;">✦ Subconscious Sync</h4>
+                <div
+                    style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-top: 12px;">
+                    <span>Pupil Dilation Variance</span>
+                    <span class="text-accent" id="dash-pupil" style="font-weight:500;">--</span>
+                </div>
+                <div
+                    style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">
+                    <span>Micro-Respiration</span>
+                    <span class="text-primary" id="dash-resp" style="font-weight:500;">--</span>
+                </div>
+            </div>
+
+            <div class="glass-card mb-4" style="padding: 16px;">
+                <h4 class="mb-2" style="font-size:0.95rem;">🌤️ Environmental Engine</h4>
+                <div
+                    style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-top: 12px;">
+                    <span>Ambient Noise Stress</span>
+                    <span class="text-primary" id="dash-noise" style="font-weight:500;">--</span>
+                </div>
+                <div
+                    style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">
+                    <span>Barometric Pressure Drop</span>
+                    <span class="text-accent" id="dash-pressure" style="font-weight:500;">--</span>
+                </div>
+            </div>
+
+            <!-- CHATBOT QUICK ACCESS -->
+            <button class="btn btn-primary mb-8" onclick="navigate('42-chat-conversation')" style="display:flex; align-items:center; justify-content:center; gap:12px; height: 65px; box-shadow: 0 10px 20px rgba(24, 112, 244, 0.2);">
+                <span>💬 Talk to NeuroWell AI</span>
+            </button>
+        </div>
+        <div id="view-17-dashboard-positive" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Positive Mood Dashboard</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <img src="logo.png" class="logo-icon mx-auto mb-4"
+                    style="width:60px; height:60px; opacity:0.5; filter: grayscale(1); border-radius:50%;">
+                <h3>Positive Mood Dashboard</h3>
+                <p class="text-muted mt-4">Screen template resting peacefully.</p>
+            </div>
+
+        </div>
+
+        <div id="view-18-dashboard-stress" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>High Stress Dashboard</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <img src="logo.png" class="logo-icon mx-auto mb-4"
+                    style="width:60px; height:60px; opacity:0.5; filter: grayscale(1); border-radius:50%;">
+                <h3>High Stress Dashboard</h3>
+                <p class="text-muted mt-4">Screen template resting peacefully.</p>
+            </div>
+
+        </div>
+
+        <div id="view-19-dashboard-weekly" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Weekly Analysis</h2>
+                <div></div>
+            </div>
+            <div class="glass-card mt-4" style="flex:1;">
+                <h3 class="mb-4">Emotional Trends</h3>
+                <p class="text-muted mb-6">Your weekly emotional summary based on multimodal data.</p>
+                
+                <div style="height: 180px; display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; margin-bottom: 24px;">
+                    <div style="flex: 1; height: 65%; background: var(--primary); border-radius: 8px; opacity: 0.6; position: relative;"><span style="position:absolute; top:-25px; left:50%; transform:translateX(-50%); font-size:0.7rem;">Mon</span></div>
+                    <div style="flex: 1; height: 80%; background: var(--primary); border-radius: 8px; opacity: 0.8; position: relative;"><span style="position:absolute; top:-25px; left:50%; transform:translateX(-50%); font-size:0.7rem;">Tue</span></div>
+                    <div style="flex: 1; height: 50%; background: var(--secondary); border-radius: 8px; position: relative;"><span style="position:absolute; top:-25px; left:50%; transform:translateX(-50%); font-size:0.7rem;">Wed</span></div>
+                    <div style="flex: 1; height: 95%; background: var(--primary); border-radius: 8px; position: relative;"><span style="position:absolute; top:-25px; left:50%; transform:translateX(-50%); font-size:0.7rem;">Thu</span></div>
+                    <div style="flex: 1; height: 70%; background: var(--primary); border-radius: 8px; opacity: 0.7; position: relative;"><span style="position:absolute; top:-25px; left:50%; transform:translateX(-50%); font-size:0.7rem;">Fri</span></div>
+                </div>
+
+                <div class="glass-card mb-4" style="background: rgba(24, 112, 244, 0.05); border: none;">
+                    <h4 style="font-size: 0.9rem;">Stress Detection: Moderate</h4>
+                    <p class="text-muted" style="font-size: 0.8rem; margin-top: 4px;">Detected elevated cortisol patterns on Wednesday.</p>
+                </div>
+                
+                <button class="btn btn-glass w-100" onclick="navigate('46-wellness-suggestions')">View Wellness Plan</button>
+            </div>
+
+        </div>
+
+        <div id="view-20-dashboard-empty" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Empty State Dashboard</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <img src="logo.png" class="logo-icon mx-auto mb-4"
+                    style="width:60px; height:60px; opacity:0.5; filter: grayscale(1); border-radius:50%;">
+                <h3>Empty State Dashboard</h3>
+                <p class="text-muted mt-4">Screen template resting peacefully.</p>
+            </div>
+
+        </div>
+
+        <div id="view-21-emotion-home" class="view">
+            <div class="header">
+                <h2>Analyze State</h2>
+            </div>
+            <p class="text-muted mb-4">Choose a method to gently analyze your current resonance.</p>
+
+            <div class="glass-card mb-4" onclick="navigate('27-behavior-tracking'); setupCamera()"
+                style="cursor:pointer;">
+                <h3>👁️ Optical-Respiratory Scan <span class="badge"
+                        style="background:var(--accent); color:white; font-size:0.6rem; vertical-align:middle;">FACE
+                        ID</span></h3>
+                <p class="text-muted mt-2" style="font-size:0.85rem;">Tracks pupil dilation and chest micro-movements to
+                    detect hidden stress.</p>
+            </div>
+
+            <div class="glass-card mb-4" onclick="navigate('22-voice-input'); setupVoice()" style="cursor:pointer;">
+                <h3>🎤 Acoustic Biomarkers <span class="badge"
+                        style="background:var(--secondary); color:white; font-size:0.6rem; vertical-align:middle;">VOICE</span>
+                </h3>
+                <p class="text-muted mt-2" style="font-size:0.85rem;">Analyzes vocal cord tension and cadence patterns.
+                </p>
+            </div>
+
+            <div class="glass-card mb-4" onclick="navigate('52-fingerprint-scan'); setupFingerprintScan()" style="cursor:pointer;">
+                <h3>👆 Fingerprint Sensor <span class="badge"
+                        style="background:var(--primary); color:white; font-size:0.6rem; vertical-align:middle;">TOUCH</span>
+                </h3>
+                <p class="text-muted mt-2" style="font-size:0.85rem;">Simulates WebAuthn native hardware verification
+                    for stress tracking.</p>
+            </div>
+
+            <div class="glass-card" onclick="navigate('28-combined-analysis')" style="cursor:pointer; border: 2px solid var(--primary); background: rgba(24, 112, 244, 0.05);">
+                <h3 class="text-primary">✨ Multimodal Integration <span class="badge"
+                        style="background:var(--primary); color:white; font-size:0.6rem; vertical-align:middle;">PRO</span>
+                </h3>
+                <p class="text-muted mt-2" style="font-size:0.85rem;">Analyze text, voice, and facial patterns together for a 360-degree emotional profile.</p>
+            </div>
+        </div>
+        <div id="view-22-voice-input" class="view">
+            <div class="header">
+                <button class="back-btn" onclick="navigate('21-emotion-home')">←</button>
+                <h2>Voice Recognition</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <div class="mic-btn mx-auto mb-4" id="voice-record-btn" style="filter:none; opacity:1;">🎤</div>
+                <p class="text-muted" id="voice-status">Tap to start recording.</p>
+                <div id="voice-transcript" class="mt-4 text-primary" style="min-height: 40px; font-style: italic;">
+                </div>
+            </div>
+        </div>
+        <div id="view-23-voice-recording" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Voice Recording Screen</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <img src="logo.png" class="logo-icon mx-auto mb-4"
+                    style="width:60px; height:60px; opacity:0.5; filter: grayscale(1); border-radius:50%;">
+                <h3>Voice Recording Screen</h3>
+                <p class="text-muted mt-4">Screen template resting peacefully.</p>
+            </div>
+
+        </div>
+
+        <div id="view-24-voice-processing" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Voice Processing Screen</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <img src="logo.png" class="logo-icon mx-auto mb-4"
+                    style="width:60px; height:60px; opacity:0.5; filter: grayscale(1); border-radius:50%;">
+                <h3>Voice Processing Screen</h3>
+                <p class="text-muted mt-4">Screen template resting peacefully.</p>
+            </div>
+
+        </div>
+
+        <div id="view-25-text-input" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Text Input Screen</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <img src="logo.png" class="logo-icon mx-auto mb-4"
+                    style="width:60px; height:60px; opacity:0.5; filter: grayscale(1); border-radius:50%;">
+                <h3>Text Input Screen</h3>
+                <p class="text-muted mt-4">Screen template resting peacefully.</p>
+            </div>
+
+        </div>
+
+        <div id="view-26-text-analysis" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Text Analysis Result</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <img src="logo.png" class="logo-icon mx-auto mb-4"
+                    style="width:60px; height:60px; opacity:0.5; filter: grayscale(1); border-radius:50%;">
+                <h3>Text Analysis Result</h3>
+                <p class="text-muted mt-4">Screen template resting peacefully.</p>
+            </div>
+
+        </div>
+
+        <div id="view-27-behavior-tracking" class="view">
+            <div class="header">
+                <button class="back-btn" onclick="navigate('21-emotion-home')">←</button>
+                <h2>Face Recognition</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; align-items:center; position: relative; overflow: hidden;">
+                <div class="video-container" style="position: relative; width: 100%; border-radius: 16px; overflow: hidden; background: #000;">
+                    <video id="face-video" autoplay playsinline
+                        style="width:100%; height: 300px; object-fit: cover;"></video>
+                    <div id="scan-line" style="position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: var(--primary); box-shadow: 0 0 10px var(--primary); display: none; animation: scanMove 2s linear infinite;"></div>
+                    <div id="capture-flash" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; opacity: 0; pointer-events: none; transition: opacity 0.1s;"></div>
+                </div>
+                <canvas id="face-canvas" style="display:none;"></canvas>
+                <div class="d-flex gap-2 w-100 mt-4">
+                    <button class="btn btn-primary" id="capture-face-btn" style="flex: 2;">Capture & Analyze</button>
+                    <button class="btn btn-glass" onclick="setupCamera()" style="flex: 1; padding: 0;"><i class="fas fa-sync"></i></button>
+                </div>
+                <div id="face-status-container" class="mt-4 w-100">
+                    <p class="text-muted" id="face-status">Initializing neural link...</p>
+                </div>
+            </div>
+        </div>
+        <div id="view-28-combined-analysis" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('21-emotion-home')">←</button>
+                <h2>Multimodal Analysis</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4" style="flex:1;">
+                <div class="breathing-circle" style="width: 120px; height: 120px; font-size: 0.8rem;">Syncing...</div>
+                <h3 class="mt-4">Holistic Evaluation</h3>
+                <p class="text-muted mb-8">Analyzing voice, face, and behavioral patterns together.</p>
+                
+                <div class="text-left">
+                    <div class="d-flex justify-content-between mb-4">
+                        <span>Acoustic Profile</span>
+                        <span class="text-primary">92% Stability</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-4">
+                        <span>Optical-Respiratory</span>
+                        <span class="text-primary">85% Calm</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-8">
+                        <span>Behavioral Flow</span>
+                        <span class="text-accent">Moderate Stress</span>
+                    </div>
+                </div>
+
+                <div class="p-4 mb-8" style="background: var(--primary-gradient); color: white; border-radius: 16px;">
+                    <p style="font-weight: bold;">Combined Score: 87</p>
+                    <p style="font-size: 0.8rem; opacity: 0.9;">Your resonance is improving. Local AI suggests a brief meditation.</p>
+                </div>
+
+                <button class="btn btn-primary w-100" onclick="navigate('16-dashboard-main')">Back to Dashboard</button>
+            </div>
+
+        </div>
+
+        <div id="view-29-insights-overview" class="view">
+            <div class="header">
+                <h2>AI Insights</h2>
+            </div>
+            <div class="glass-card mb-4 mt-4" style="background:linear-gradient(135deg,rgba(24,112,244,0.08),rgba(255,133,45,0.05));">
+                <h3 class="mb-2">Your Resonance</h3>
+                <p class="text-muted">Your emotional intelligence summary, processed 100% locally.</p>
+            </div>
+
+            <!-- NEW: Advanced Analytics Cards -->
+            <div class="feature-grid mb-4">
+                <div class="feature-card fc-blue" onclick="navigate('78-emotional-analytics')">
+                    <div class="fc-icon">📊</div>
+                    <div class="fc-title">Emotional Analytics</div>
+                    <div class="fc-value">Weekly &amp; Monthly</div>
+                </div>
+                <div class="feature-card fc-amber" onclick="navigate('74-burnout-detector')">
+                    <div class="fc-icon">🔥</div>
+                    <div class="fc-title">Burnout Detector</div>
+                    <div class="fc-value">AI risk analysis</div>
+                </div>
+                <div class="feature-card fc-green" onclick="navigate('72-wellness-score')">
+                    <div class="fc-icon">🧠</div>
+                    <div class="fc-title">Wellness Score</div>
+                    <div class="fc-value">0–100 index</div>
+                </div>
+                <div class="feature-card fc-purple" onclick="navigate('71-mood-forecast')">
+                    <div class="fc-icon">🔮</div>
+                    <div class="fc-title">Mood Forecast</div>
+                    <div class="fc-value">7-day prediction</div>
+                </div>
+            </div>
+
+            <button class="btn btn-glass mb-3 w-100 text-left" onclick="navigate('19-dashboard-weekly')">📅 Weekly Summary</button>
+            <button class="btn btn-glass mb-3 w-100 text-left" onclick="navigate('33-stress-breakdown')">📊 Stress Breakdown</button>
+            <button class="btn btn-glass mb-3 w-100 text-left" onclick="navigate('34-trigger-detection')">🔍 Trigger Detection</button>
+            <button class="btn btn-glass mb-3 w-100 text-left" onclick="navigate('31-weekly-trends')">📈 Weekly Trends Chart</button>
+            <button class="btn btn-primary w-100 mt-2" onclick="navigate('46-wellness-suggestions')">Explore Therapies</button>
+        </div>
+        <div id="view-30-mood-report" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Detailed Mood Report</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <img src="logo.png" class="logo-icon mx-auto mb-4"
+                    style="width:60px; height:60px; opacity:0.5; filter: grayscale(1); border-radius:50%;">
+                <h3>Detailed Mood Report</h3>
+                <p class="text-muted mt-4">Screen template resting peacefully.</p>
+            </div>
+
+        </div>
+
+        <div id="view-31-weekly-trends" class="view">
+            <div class="header">
+                <button class="back-btn" onclick="navigate('29-insights-overview')">←</button>
+                <h2>Weekly Trends</h2>
+                <div></div>
+            </div>
+
+            <div class="glass-card mb-4" style="padding: 24px 16px;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:16px;">
+                    <div>
+                        <p class="text-muted" style="font-size:0.85rem;">Avg Resonance</p>
+                        <h2 class="text-primary" style="font-size:2.5rem;">78 <span
+                                style="font-size:1rem; color:var(--primary-light);">+5%</span></h2>
+                    </div>
+                    <div style="text-align:right;">
+                        <p class="text-muted" style="font-size:0.85rem;">Highest</p>
+                        <p class="text-accent" style="font-weight:600;">Thursday</p>
+                    </div>
+                </div>
+
+                <!-- CSS Bar Chart -->
+                <div
+                    style="display:flex; justify-content:space-between; align-items:flex-end; height:150px; margin-top:30px; gap:8px;">
+                    <!-- Mon -->
+                    <div style="display:flex; flex-direction:column; align-items:center; flex:1;">
+                        <div
+                            style="width:100%; height:60px; background:rgba(107, 142, 130, 0.4); border-radius:6px; transition:0.3s;">
+                        </div>
+                        <p class="text-muted mt-2" style="font-size:0.75rem;">M</p>
+                    </div>
+                    <!-- Tue -->
+                    <div style="display:flex; flex-direction:column; align-items:center; flex:1;">
+                        <div
+                            style="width:100%; height:80px; background:rgba(107, 142, 130, 0.6); border-radius:6px; transition:0.3s;">
+                        </div>
+                        <p class="text-muted mt-2" style="font-size:0.75rem;">T</p>
+                    </div>
+                    <!-- Wed -->
+                    <div style="display:flex; flex-direction:column; align-items:center; flex:1;">
+                        <div
+                            style="width:100%; height:45px; background:rgba(216, 159, 122, 0.7); border-radius:6px; transition:0.3s;">
+                        </div>
+                        <p class="text-muted mt-2" style="font-size:0.75rem;">W</p>
+                    </div>
+                    <!-- Thu -->
+                    <div style="display:flex; flex-direction:column; align-items:center; flex:1;">
+                        <div
+                            style="width:100%; height:120px; background:var(--primary-gradient); border-radius:6px; transition:0.3s; box-shadow:0 4px 10px rgba(107, 142, 130, 0.3);">
+                        </div>
+                        <p class="text-primary mt-2" style="font-size:0.75rem; font-weight:600;">T</p>
+                    </div>
+                    <!-- Fri -->
+                    <div style="display:flex; flex-direction:column; align-items:center; flex:1;">
+                        <div
+                            style="width:100%; height:90px; background:rgba(107, 142, 130, 0.6); border-radius:6px; transition:0.3s;">
+                        </div>
+                        <p class="text-muted mt-2" style="font-size:0.75rem;">F</p>
+                    </div>
+                    <!-- Sat -->
+                    <div style="display:flex; flex-direction:column; align-items:center; flex:1;">
+                        <div
+                            style="width:100%; height:100px; background:rgba(107, 142, 130, 0.7); border-radius:6px; transition:0.3s;">
+                        </div>
+                        <p class="text-muted mt-2" style="font-size:0.75rem;">S</p>
+                    </div>
+                    <!-- Sun -->
+                    <div style="display:flex; flex-direction:column; align-items:center; flex:1;">
+                        <div
+                            style="width:100%; height:85px; background:rgba(107, 142, 130, 0.5); border-radius:6px; transition:0.3s;">
+                        </div>
+                        <p class="text-muted mt-2" style="font-size:0.75rem;">S</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card mb-4" style="padding: 16px;">
+                <h4 class="mb-2" style="font-size:0.95rem;">Key Insights</h4>
+                <div
+                    style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-top: 12px; border-bottom:1px solid rgba(0,0,0,0.05); padding-bottom:8px;">
+                    <span>Deep Sleep Correlation</span>
+                    <span class="text-primary" style="font-weight:500;">High Impact (+12%)</span>
+                </div>
+                <div
+                    style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">
+                    <span>Social Activity Impact</span>
+                    <span class="text-accent" style="font-weight:500;">Draining (-4%)</span>
+                </div>
+            </div>
+        </div>
+        <div id="view-32-monthly-analytics" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Monthly Analytics</h2>
+                <div></div>
+            </div>
+          <div class="p-6">
+            <div class="glass-card mb-6">
+                <h3 class="mb-4">Resonance Trend</h3>
+                <div style="height: 200px; border-left: 1px solid #ddd; border-bottom: 1px solid #ddd; position: relative; overflow: hidden;">
+                    <!-- SVG Chart Mock -->
+                    <svg viewBox="0 0 100 40" style="width: 100%; height: 100%;" preserveAspectRatio="none">
+                        <path d="M0,35 Q10,10 20,25 T40,15 T60,30 T80,5 T100,20" fill="none" stroke="var(--primary)" stroke-width="1.5" />
+                        <path d="M0,35 Q10,10 20,25 T40,15 T60,30 T80,5 T100,20 L100,40 L0,40 Z" fill="var(--primary)" opacity="0.1" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <h3>Monthly Milestones</h3>
+                <div class="mt-4">
+                    <div class="p-3 mb-3" style="background: rgba(var(--primary-rgb), 0.1); border-radius: 12px;">
+                        <p class="text-primary" style="font-weight: bold;">Peak Stability</p>
+                        <p class="text-muted" style="font-size: 0.8rem;">May 14th — Heart rate variability was at a record high.</p>
+                    </div>
+                    <div class="p-3" style="background: rgba(var(--accent-rgb), 0.1); border-radius: 12px;">
+                        <p class="text-accent" style="font-weight: bold;">Deep Sleep Focus</p>
+                        <p class="text-muted" style="font-size: 0.8rem;">May 2nd — 8.5 hours of high-resonance recovery.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        </div>
+
+        <div id="view-33-stress-breakdown" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Stress Breakdown</h2>
+                <div></div>
+            </div>
+        <div class="p-6">
+            <div class="glass-card mb-6">
+                <h3 class="mb-4">Weekly Stress Load</h3>
+                <div style="height: 150px; display: flex; align-items: flex-end; justify-content: space-between; gap: 8px;">
+                    <div style="flex: 1; height: 40%; background: var(--primary); border-radius: 4px; opacity: 0.6;"></div>
+                    <div style="flex: 1; height: 75%; background: var(--primary); border-radius: 4px; opacity: 0.8;"></div>
+                    <div style="flex: 1; height: 90%; background: var(--accent); border-radius: 4px;"></div>
+                    <div style="flex: 1; height: 60%; background: var(--primary); border-radius: 4px; opacity: 0.7;"></div>
+                    <div style="flex: 1; height: 35%; background: var(--primary); border-radius: 4px; opacity: 0.5;"></div>
+                    <div style="flex: 1; height: 85%; background: var(--primary); border-radius: 4px; opacity: 0.9;"></div>
+                    <div style="flex: 1; height: 20%; background: var(--primary); border-radius: 4px; opacity: 0.4;"></div>
+                </div>
+                <div class="d-flex justify-content-between mt-2 text-muted" style="font-size: 0.7rem;">
+                    <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+                </div>
+            </div>
+
+            <div class="glass-card mb-6">
+                <h3>Primary Stressors</h3>
+                <div class="mt-4">
+                    <div class="d-flex justify-content-between mb-2"><span>Work / Deadlines</span><span class="text-accent">High</span></div>
+                    <div class="progress mb-4"><div class="progress-bar" style="width: 85%; background: var(--accent);"></div></div>
+                    
+                    <div class="d-flex justify-content-between mb-2"><span>Sleep Quality</span><span class="text-primary">Moderate</span></div>
+                    <div class="progress mb-4"><div class="progress-bar" style="width: 45%; background: var(--primary);"></div></div>
+                    
+                    <div class="d-flex justify-content-between mb-2"><span>Environmental Noise</span><span class="text-primary">Low</span></div>
+                    <div class="progress"><div class="progress-bar" style="width: 20%; background: var(--primary);"></div></div>
+                </div>
+            </div>
+        </div>
+
+        </div>
+
+        <div id="view-34-trigger-detection" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Trigger Detection Screen</h2>
+                <div></div>
+            </div>
+        <div class="p-6">
+            <div class="glass-card mb-6">
+                <h3>Detected Triggers</h3>
+                <p class="text-muted mb-6">Our AI has identified patterns in your environment that affect your state.</p>
+                
+                <div class="d-flex align-items-center mb-6">
+                    <div style="font-size: 2rem; margin-right: 16px;">🔊</div>
+                    <div>
+                        <p style="font-weight: bold;">High Ambient Noise</p>
+                        <p class="text-muted" style="font-size: 0.8rem;">Detected 5 instances of noise over 70dB during deep focus.</p>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center mb-6">
+                    <div style="font-size: 2rem; margin-right: 16px;">☕</div>
+                    <div>
+                        <p style="font-weight: bold;">Caffeine Response</p>
+                        <p class="text-muted" style="font-size: 0.8rem;">Correlation found between late-day coffee and reduced REM sleep.</p>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <div style="font-size: 2rem; margin-right: 16px;">💻</div>
+                    <div>
+                        <p style="font-weight: bold;">Blue Light Exposure</p>
+                        <p class="text-muted" style="font-size: 0.8rem;">High screen time detected in the 60 minutes before sleep.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4" style="background: var(--primary); border-radius: 16px; color: white;">
+                <p style="font-weight: bold;">AI Recommendation</p>
+                <p style="font-size: 0.8rem; margin-top: 8px;">"Switch to Neural-Acoustic therapy for 15 minutes to reset your vagus nerve tone."</p>
+            </div>
+        </div>
+
+        </div>
+
+        <div id="view-35-ai-explanation" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>AI Explanation Screen</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <img src="logo.png" class="logo-icon mx-auto mb-4"
+                    style="width:60px; height:60px; opacity:0.5; filter: grayscale(1); border-radius:50%;">
+                <h3>AI Explanation Screen</h3>
+                <p class="text-muted mt-4">Screen template resting peacefully.</p>
+            </div>
+
+        </div>
+
+        <div id="view-36-mood-calendar" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Mood Calendar</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <img src="logo.png" class="logo-icon mx-auto mb-4"
+                    style="width:60px; height:60px; opacity:0.5; filter: grayscale(1); border-radius:50%;">
+                <h3>Mood Calendar</h3>
+                <p class="text-muted mt-4">Screen template resting peacefully.</p>
+            </div>
+
+        </div>
+
+        <div id="view-37-add-mood" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Add Mood Entry</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <h3>Log Your Mood</h3>
+                <p class="text-muted mb-6">Capture the nuance of this moment.</p>
+                
+                <div class="text-left" style="width: 100%;">
+                    <select id="mood-entry-score" class="input-field mb-4">
+                        <option value="10">Excellent (10)</option>
+                        <option value="8">Good (8)</option>
+                        <option value="6" selected>Neutral (6)</option>
+                        <option value="4">Down (4)</option>
+                        <option value="2">Very Poor (2)</option>
+                    </select>
+                    
+                    <textarea id="mood-entry-notes" class="input-field mb-4" style="height: 120px; padding: 15px;" placeholder="What's on your mind?"></textarea>
+                    
+                    <button id="mood-save-btn" class="btn btn-primary w-100">Save Entry</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="view-38-edit-mood" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Edit Mood Entry</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <img src="logo.png" class="logo-icon mx-auto mb-4"
+                    style="width:60px; height:60px; opacity:0.5; filter: grayscale(1); border-radius:50%;">
+                <h3>Edit Mood Entry</h3>
+                <p class="text-muted mt-4">Screen template resting peacefully.</p>
+            </div>
+
+        </div>
+
+        <div id="view-39-mood-timeline" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Mood Timeline</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <img src="logo.png" class="logo-icon mx-auto mb-4"
+                    style="width:60px; height:60px; opacity:0.5; filter: grayscale(1); border-radius:50%;">
+                <h3>Mood Timeline</h3>
+                <p class="text-muted mt-4">Screen template resting peacefully.</p>
+            </div>
+
+        </div>
+
+        <div id="view-40-mood-comparison" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Mood Comparison</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <img src="logo.png" class="logo-icon mx-auto mb-4"
+                    style="width:60px; height:60px; opacity:0.5; filter: grayscale(1); border-radius:50%;">
+                <h3>Mood Comparison</h3>
+                <p class="text-muted mt-4">Screen template resting peacefully.</p>
+            </div>
+
+        </div>
+
+        <div id="view-41-chat-home" class="view">
+
+            <div class="header">
+                <h2>AI Guide</h2>
+            </div>
+            <div class="glass-card text-center mb-4" style="flex:1;">
+                <img src="logo.png" class="logo-icon mb-4 mx-auto"
+                    style="width:80px; height:80px; border-radius:50%; object-fit:cover; padding:4px;">
+                <h3 class="mb-2">Your Empathetic Guide</h3>
+                <p class="text-muted mb-8">A private, non-judgmental space processing locally to preserve your peace of
+                    mind.</p>
+                <button class="btn btn-primary" onclick="navigate('42-chat-conversation')">Talk to Guide</button>
+            </div>
+
+        </div>
+
+        <div id="view-42-chat-conversation" class="view">
+            <div class="header">
+                <button class="back-btn" onclick="navigate('41-chat-home')">←</button>
+                <h2>Chat Conversation</h2>
+                <div></div>
+            </div>
+
+            <div class="chat-messages"
+                style="display:flex; flex-direction:column; flex:1; gap:16px; overflow-y:auto; padding:10px 0;">
+                <div class="msg msg-ai">Hello, I'm here. This is a secure, private space. How are you feeling today?
+                </div>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top: auto; padding-top:10px;">
+                <input type="text" class="input-field chat-input" placeholder="Type your feelings securely..."
+                    style="flex:1;">
+                <button class="btn btn-primary chat-send-btn"
+                    style="width: 60px; padding: 0; display:flex; justify-content:center; align-items:center; font-size:1.5rem;">➤</button>
+            </div>
+        </div>
+        <div id="view-43-suggested-replies" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Suggested Replies</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <img src="logo.png" class="logo-icon mx-auto mb-4"
+                    style="width:60px; height:60px; opacity:0.5; filter: grayscale(1); border-radius:50%;">
+                <h3>Suggested Replies</h3>
+                <p class="text-muted mt-4">Screen template resting peacefully.</p>
+            </div>
+
+        </div>
+
+        <div id="view-44-crisis-alert" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Crisis Alert Screen</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <img src="logo.png" class="logo-icon mx-auto mb-4"
+                    style="width:60px; height:60px; opacity:0.5; filter: grayscale(1); border-radius:50%;">
+                <h3>Crisis Alert Screen</h3>
+                <p class="text-muted mt-4">Screen template resting peacefully.</p>
+            </div>
+
+        </div>
+
+        <div id="view-45-chat-history" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Chat History</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <img src="logo.png" class="logo-icon mx-auto mb-4"
+                    style="width:60px; height:60px; opacity:0.5; filter: grayscale(1); border-radius:50%;">
+                <h3>Chat History</h3>
+                <p class="text-muted mt-4">Screen template resting peacefully.</p>
+            </div>
+
+        </div>
+
+        <div id="view-46-wellness-suggestions" class="view">
+
+            <div class="header">
+                <button class="back-btn" onclick="navigate('29-insights-overview')">←</button>
+                <h2>Therapies</h2>
+                <div></div>
+            </div>
+            <div class="glass-card mb-4 mt-4" style="text-align:center;">
+                <h3 class="mb-2">🎵 Neural-Acoustic Generation</h3>
+                <p class="text-muted mb-4" style="font-size:0.85rem;">Real-time binaural frequencies synthesized
+                    specifically for your current brainwave state to induce calmness.</p>
+                <div class="loader mx-auto mb-4" style="border-top-color: var(--accent);"></div>
+                <p class="text-accent mb-4">Generating 432Hz Theta Waves...</p>
+                <button class="btn btn-primary" onclick="navigate('47-meditation-player')">Begin Session</button>
+            </div>
+            <div class="glass-card mb-4">
+                <h3 class="mb-2">🌬️ Somatic Reset</h3>
+                <p class="text-muted" style="font-size:0.85rem;">A 2-minute physical engagement to reset your vagus
+                    nerve.</p>
+                <button class="btn btn-glass mt-4" onclick="navigate('48-breathing-exercise')">Start Breathing</button>
+            </div>
+
+        </div>
+
+        <div id="view-47-meditation-player" class="view">
+            <div class="header">
+                <button class="back-btn" onclick="navigate('46-wellness-suggestions')">←</button>
+                <h2>Acoustic Therapy</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <h3>432Hz Theta Waves</h3>
+                <p class="text-muted mt-2">Synthesized for your current resonance state.</p>
+
+                <div class="audio-waves">
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                </div>
+
+                <h2 class="text-gradient mt-4" style="font-size:2.5rem; font-family:'Inter'; font-weight:300;">14:59
+                </h2>
+
+                <div style="display:flex; justify-content:center; gap:20px; align-items:center; margin-top: 40px;">
+                    <div class="avatar"
+                        style="width:40px; height:40px; background:var(--glass-bg); color:var(--text-main);">⏮</div>
+                    <div class="avatar" style="width:64px; height:64px; font-size:1.5rem;">⏸</div>
+                    <div class="avatar"
+                        style="width:40px; height:40px; background:var(--glass-bg); color:var(--text-main);">⏭</div>
+                </div>
+
+                <button class="btn btn-glass mt-auto" onclick="navigate('16-dashboard-main')">Finish Session</button>
+            </div>
+        </div>
+        <div id="view-48-breathing-exercise" class="view">
+            <div class="header">
+                <button class="back-btn" onclick="navigate('46-wellness-suggestions')">←</button>
+                <h2>Somatic Reset</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <h3>Box Breathing</h3>
+                <p class="text-muted mt-2">Follow the circle to reset your vagus nerve.</p>
+
+                <div class="breathing-circle">Breathe</div>
+
+                <div class="mt-8">
+                    <p class="text-primary mb-2">Inhale 4s • Hold 4s • Exhale 4s</p>
+                </div>
+
+                <button class="btn btn-glass mt-auto" onclick="navigate('16-dashboard-main')">End Session</button>
+            </div>
+        </div>
+
+        <div id="view-52-fingerprint-scan" class="view">
+            <div class="header">
+                <button class="back-btn" onclick="navigate('21-emotion-home')">←</button>
+                <h2>Touch Biomarkers</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4"
+                style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; position:relative; overflow:hidden; min-height:450px;">
+                
+                <div class="fingerprint-scan-container mb-6" style="margin-top:20px;">
+                    <div class="scan-ring"></div>
+                    <div id="fingerprint-scan-btn" class="fingerprint-pad" style="font-size: 3.5rem; cursor: pointer; user-select: none;">👆</div>
+                </div>
+
+                <h3 id="fingerprint-scan-title" class="mb-2">Place & Hold Finger</h3>
+                <p class="text-muted mb-6" id="fingerprint-scan-status" style="max-width: 320px; font-size:0.85rem;">Press and hold the sensor to capture Heart Rate Variability (HRV) and Galvanic Skin Response (GSR) telemetry.</p>
+                
+                <div id="fingerprint-progress-bar" class="progress w-100" style="display:none; height:8px; max-width:280px; margin: 0 auto 24px;">
+                    <div class="progress-bar" id="fingerprint-progress" style="width: 0%; background: var(--primary);"></div>
+                </div>
+                
+                <div class="scan-pulse-wave" id="scan-pulse-wave" style="display:none; margin-bottom:20px;">
+                    <span></span><span></span><span></span><span></span><span></span>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-55-biometric-result" class="view">
+            <div class="header">
+                <button class="back-btn" onclick="navigate('21-emotion-home')">←</button>
+                <h2>Resonance Profile</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4 mb-4 p-6 emotion-result-card" id="emotion-result-container"
+                style="border-top: 6px solid var(--primary); background: #ffffff;">
+                <p class="text-muted" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; font-weight:bold;" id="result-source-label">BIOMETRIC SCAN</p>
+                <div class="detected-feeling-badge mt-2" id="result-feeling-badge" style="display:inline-block; font-size:0.8rem; padding: 6px 14px; border-radius:20px; color:white; font-weight:bold;">STRESS DETECTED</div>
+                
+                <div class="emotion-glow-blob my-4 mx-auto" id="result-emotion-blob" style="width:70px; height:70px; border-radius:50%; font-size:2.2rem; display:flex; align-items:center; justify-content:center; margin: 16px auto; box-shadow:0 0 20px rgba(0,0,0,0.05);">⚡</div>
+                
+                <h3 class="mb-2" id="result-feeling-title" style="font-size:1.3rem;">Elevated Tension</h3>
+                <p class="text-muted mb-4" style="font-size:0.85rem;" id="result-feeling-desc">
+                    Your biomarkers match a stress/tension profile. We recommend a somatic reset to lower vagal nerve strain.
+                </p>
+                
+                <div class="mt-4 text-left w-100" id="result-metrics-breakdown" style="border-top: 1px solid rgba(0,0,0,0.05); padding-top:16px;">
+                    <!-- Metrics get injected here dynamically -->
+                </div>
+            </div>
+
+            <div class="glass-card mb-4" style="background: white; border-top: 4px solid var(--secondary); padding:20px;">
+                <h4 style="font-size:0.95rem; font-weight:700;" class="mb-2">✦ Suggested Therapies</h4>
+                <p class="text-muted mb-4" style="font-size:0.8rem;">Tap below to immediately begin a therapy targeted for your current state.</p>
+                
+                <div id="suggested-therapies-list" style="display:flex; flex-direction:column; gap:12px;">
+                    <!-- Suggested therapy buttons go here -->
+                </div>
+            </div>
+
+            <button class="btn btn-primary w-100 mb-4" onclick="navigate('16-dashboard-main')">Back to Dashboard</button>
+        </div>
+
+        <div id="view-49-privacy-dashboard" class="view">
+            <div class="header">
+                <button class="back-btn" onclick="navigate('50-profile-settings')">←</button>
+                <h2>Privacy Vault</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mt-4 mb-4" style="border: 1px solid var(--primary-light);">
+                <div class="logo-icon mx-auto mb-4"
+                    style="width:60px; height:60px; font-size:2rem; background: var(--primary-gradient); color:white;">
+                    🔒</div>
+                <h3 class="text-primary">100% Local Processing</h3>
+                <p class="text-muted mt-2">Your biometric and emotional data never leaves your device.</p>
+            </div>
+
+            <div class="glass-card mb-4"
+                style="display:flex; justify-content:space-between; align-items:center; padding: 16px;">
+                <div>
+                    <h4>Edge ML Engine</h4>
+                    <p class="text-muted" style="font-size:0.8rem;">Run AI models locally.</p>
+                </div>
+                <div style="width:44px; height:24px; background:var(--primary); border-radius:12px; position:relative;">
+                    <div
+                        style="width:20px; height:20px; background:white; border-radius:50%; position:absolute; top:2px; right:2px;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card mb-4"
+                style="display:flex; justify-content:space-between; align-items:center; padding: 16px;">
+                <div>
+                    <h4>E2E Encryption</h4>
+                    <p class="text-muted" style="font-size:0.8rem;">For local backup files.</p>
+                </div>
+                <div style="width:44px; height:24px; background:var(--primary); border-radius:12px; position:relative;">
+                    <div
+                        style="width:20px; height:20px; background:white; border-radius:50%; position:absolute; top:2px; right:2px;">
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-danger w-100 mt-auto" onclick="alert('Local data securely wiped.')">Wipe Local
+                Data</button>
+        </div>
+        <div id="view-50-profile-settings" class="view">
+            <div class="header">
+                <h2>Profile & Settings</h2>
+            </div>
+            <div class="glass-card text-center mb-4 mt-4">
+                <div class="avatar mx-auto mb-4" style="width:80px;height:80px;font-size:2rem;">A</div>
+                <h3>Alex Doe</h3>
+                <p class="text-primary mt-2">Local Privacy Mode: ACTIVE</p>
+            </div>
+            <button class="btn btn-glass mb-3 text-left w-100" onclick="navigate('73-voice-journal')">🎙️ Voice Journal</button>
+            <button class="btn btn-glass mb-3 text-left w-100" onclick="navigate('75-wellness-planner')">📋 Daily Wellness Planner</button>
+            <button class="btn btn-glass mb-3 text-left w-100" onclick="navigate('76-music-therapy')">🎵 Music Therapy</button>
+            <button class="btn btn-glass mb-3 text-left w-100" onclick="navigate('49-privacy-dashboard')">🔒 Privacy Dashboard</button>
+            <button class="btn btn-glass mb-3 text-left w-100" onclick="navigate('14-goals')">🎯 Edit Goals</button>
+            <button class="btn btn-glass mb-3 text-left w-100" onclick="navigate('15-notifications')">🔔 Notifications</button>
+            <button class="btn btn-glass mb-3 text-left w-100" onclick="navigate('51-subscription-plans')">💎 Subscription Plans</button>
+            
+            <div class="social-links mt-4">
+                <a href="https://instagram.com" target="_blank" class="social-icon instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://wa.me/" target="_blank" class="social-icon whatsapp"><i class="fab fa-whatsapp"></i></a>
+                <a href="https://facebook.com" target="_blank" class="social-icon facebook"><i class="fab fa-facebook"></i></a>
+            </div>
+
+            <button id="logout-btn" class="btn btn-danger w-100 mt-8">Log Out</button>
+        </div>
+
+        <div id="view-51-subscription-plans" class="view">
+            <div class="header">
+                <button class="back-btn" onclick="navigate('50-profile-settings')">←</button>
+                <h2>Subscription</h2>
+                <div></div>
+            </div>
+            <div class="glass-card text-center mb-4 mt-4">
+                <h3>Upgrade to Premium</h3>
+                <p class="text-muted mt-2" style="font-size:0.9rem;">Unlock advanced biometric syncing and unlimited acoustic therapies.</p>
+            </div>
+            
+            <div class="glass-card mb-4">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h4>Basic Plan</h4>
+                    <span class="text-muted" style="font-weight: bold;">Free</span>
+                </div>
+                <ul style="list-style: none; padding: 0; font-size: 0.9rem; color: var(--text-muted); text-align: left;">
+                    <li style="margin-bottom: 8px;">✦ Basic Dashboard Metrics</li>
+                    <li style="margin-bottom: 8px;">✦ Standard Acoustic Therapy</li>
+                    <li style="margin-bottom: 8px;">✦ Local Privacy Mode</li>
+                </ul>
+                <button class="btn btn-glass w-100 mt-4 text-muted" disabled>Current Plan</button>
+            </div>
+
+            <div class="glass-card mb-4" style="border: 1px solid var(--primary); position: relative;">
+                <div style="position: absolute; top: -12px; right: 16px; background: var(--primary); padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; color: #fff;">RECOMMENDED</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h4>Pro Plan</h4>
+                    <span class="text-primary" style="font-weight: bold;">$9.99/mo</span>
+                </div>
+                <ul style="list-style: none; padding: 0; font-size: 0.9rem; color: var(--text-muted); text-align: left;">
+                    <li style="margin-bottom: 8px;">✦ Advanced Subconscious Biometric Sync</li>
+                    <li style="margin-bottom: 8px;">✦ Premium Neural-Acoustic Audio</li>
+                    <li style="margin-bottom: 8px;">✦ Infinite Environmental Engine Access</li>
+                    <li style="margin-bottom: 8px;">✦ Priority Local Processing</li>
+                </ul>
+                <button class="btn btn-primary w-100 mt-4" onclick="alert('Proceeding to secure checkout...')">Upgrade to Pro</button>
+            </div>
+        </div>
+
+        <!-- BOTTOM NAVIGATION -->
+        <div class="bottom-nav" id="bottom-nav" style="display: none;">
+            <div class="nav-item active" data-target="16-dashboard-main" onclick="navigate('16-dashboard-main')">
+                <div class="nav-icon">🏠</div><span>Home</span>
+            </div>
+            <div class="nav-item" data-target="21-emotion-home" onclick="navigate('21-emotion-home')">
+                <div class="nav-icon">🌿</div><span>Analyze</span>
+            </div>
+            <div class="nav-item" data-target="29-insights-overview" onclick="navigate('29-insights-overview')">
+                <div class="nav-icon">📊</div><span>Insights</span>
+            </div>
+            <div class="nav-item" data-target="41-chat-home" onclick="navigate('41-chat-home')">
+                <div class="nav-icon">💬</div><span>Guide</span>
+            </div>
+            <div class="nav-item" data-target="50-profile-settings" onclick="navigate('50-profile-settings')">
+                <div class="nav-icon">👤</div><span>Profile</span>
+            </div>
+        </div>
+        <!-- SOS Floating Action Button -->
+        <button id="sos-fab" onclick="navigate('77-sos-support')" title="Emergency SOS Support" style="display:none;">🆘</button>
+    </div>
+
+        <!-- VIEW 60: PRIVATE MENTOR -->
+        <div id="view-60-private-mentor" class="view">
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Private Mentor</h2>
+                <div></div>
+            </div>
+            <div class="p-6">
+                <div class="text-center mb-6">
+                    <div class="avatar mx-auto mb-4" style="width: 80px; height: 80px; font-size: 2rem; background: linear-gradient(135deg, var(--primary), var(--accent));">S</div>
+                    <h3 class="mb-1">Mentor Seraphina</h3>
+                    <p class="text-muted" style="font-size: 0.8rem;">Personal Neural-Emotional Guide</p>
+                </div>
+                
+                <div class="glass-card mb-4" style="border-left: 4px solid var(--primary); padding: 12px;">
+                    <p id="mentor-greeting" style="font-style: italic; color: var(--text-muted); font-size: 0.85rem;">"I've analyzed your latest telemetry. Let's talk about what's on your mind."</p>
+                </div>
+
+                <div class="chat-container glass-card" style="height: 350px; display: flex; flex-direction: column;">
+                    <div id="mentor-chat-messages" class="chat-messages p-4" style="flex: 1; overflow-y: auto; font-size: 0.9rem;">
+                        <div class="msg msg-ai">I am here for you. How are you feeling right now?</div>
+                    </div>
+                    <div class="p-3 d-flex gap-2" style="border-top: 1px solid rgba(0,0,0,0.05);">
+                        <input type="text" id="mentor-chat-input" class="input-field" placeholder="Type here..." style="margin-bottom: 0; font-size: 0.8rem;">
+                        <button class="btn btn-primary" id="mentor-send-btn" style="padding: 8px 16px;">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 70: THOUGHT OF THE DAY (MODAL) -->
+        <div id="view-70-thought" class="view" style="background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); justify-content: center; z-index: 200;">
+            <div class="glass-card text-center p-8" style="border: 4px solid var(--primary); animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+                <div style="font-size: 3rem; margin-bottom: 20px;">✨</div>
+                <h2 class="mb-4 text-gradient" style="font-size: 1.8rem;">Thought of the Day</h2>
+                <p id="daily-quote" style="font-size: 1.2rem; font-weight: 500; color: var(--text-main); line-height: 1.6; margin-bottom: 32px;">"Your mind is like a garden; your thoughts are the seeds. You can grow flowers or you can grow weeds."</p>
+                <button class="btn btn-primary" onclick="navigate('16-dashboard-main')">Let's Flourish</button>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             VIEW 71: AI MOOD FORECASTING
+        ═══════════════════════════════════════════════════════════ -->
+        <div id="view-71-mood-forecast" class="view">
+            <div class="header">
+                <button class="back-btn" onclick="navigate('29-insights-overview')">←</button>
+                <h2>Mood Forecast</h2>
+                <div></div>
+            </div>
+
+            <div class="glass-card mb-4" style="background:linear-gradient(135deg,rgba(24,112,244,0.08),rgba(255,133,45,0.05));text-align:center;padding:20px 16px;">
+                <p class="text-muted" style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:6px;">AI PREDICTION ENGINE</p>
+                <h3 style="font-size:1.1rem;margin-bottom:6px;">7-Day Emotional Outlook</h3>
+                <p class="text-muted" style="font-size:0.8rem;">Based on your mood history, sleep patterns &amp; behavioral trends.</p>
+            </div>
+
+            <div class="glass-card mb-4" style="padding:20px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                    <h4 style="font-size:0.95rem;">Mood Trajectory</h4>
+                    <span class="nw-tooltip" id="forecast-trend-badge">Stable</span>
+                </div>
+                <div class="forecast-chart" id="forecast-chart-container">
+                    <!-- Rendered by NW_MoodForecast.render() -->
+                    <div style="text-align:center;width:100%;color:var(--text-muted);font-size:0.85rem;padding:40px 0;">Loading forecast...</div>
+                </div>
+                <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(0,0,0,0.05);">
+                    <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.5;">
+                        🤖 <strong>AI Analysis:</strong> Your emotional patterns suggest a <span id="forecast-summary-text">stable</span> week ahead. Maintain your current wellness habits for the best outcomes.
+                    </p>
+                </div>
+            </div>
+
+            <div class="glass-card mb-4" style="padding:16px;">
+                <h4 style="font-size:0.9rem;margin-bottom:12px;">📌 Forecast Factors</h4>
+                <div class="metric-row"><span class="mr-label">😴 Sleep Quality Impact</span><span class="mr-value" style="color:var(--primary);">High</span></div>
+                <div class="metric-row"><span class="mr-label">💼 Stress Accumulation</span><span class="mr-value" style="color:#f59e0b;">Moderate</span></div>
+                <div class="metric-row"><span class="mr-label">📈 Historical Trend</span><span class="mr-value" id="forecast-hist-trend" style="color:#10b981;">Improving</span></div>
+                <div class="metric-row"><span class="mr-label">🧘 Activity Level</span><span class="mr-value" style="color:var(--primary);">Optimal</span></div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+                <button class="btn btn-glass" onclick="navigate('75-wellness-planner')">📋 Plan My Week</button>
+                <button class="btn btn-primary" onclick="navigate('76-music-therapy')">🎵 Music Therapy</button>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             VIEW 72: MENTAL WELLNESS SCORE
+        ═══════════════════════════════════════════════════════════ -->
+        <div id="view-72-wellness-score" class="view">
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Wellness Score</h2>
+                <div></div>
+            </div>
+
+            <div class="glass-card mb-4 text-center" style="padding:28px 20px;background:linear-gradient(135deg,rgba(16,185,129,0.06),rgba(24,112,244,0.04));">
+                <!-- SVG circular progress rendered by JS -->
+                <div id="wellness-circle-container"></div>
+                <div id="wellness-status-badge" class="wellness-status-badge good" style="margin-top:10px;">Good</div>
+                <p id="wellness-summary-text" class="text-muted mt-2" style="font-size:0.82rem;max-width:260px;margin:12px auto 0;line-height:1.5;">
+                    Your mental wellness is in a healthy range.
+                </p>
+            </div>
+
+            <div class="glass-card mb-4" style="padding:16px;">
+                <h4 style="font-size:0.9rem;margin-bottom:14px;">📊 Score Breakdown</h4>
+                <div id="wellness-breakdown">
+                    <!-- Rendered by NW_WellnessScore -->
+                    <div class="shimmer" style="height:36px;margin-bottom:8px;"></div>
+                    <div class="shimmer" style="height:36px;margin-bottom:8px;"></div>
+                    <div class="shimmer" style="height:36px;margin-bottom:8px;"></div>
+                    <div class="shimmer" style="height:36px;margin-bottom:8px;"></div>
+                    <div class="shimmer" style="height:36px;"></div>
+                </div>
+            </div>
+
+            <div class="glass-card mb-4" style="background:linear-gradient(135deg,rgba(24,112,244,0.06),rgba(16,185,129,0.04));padding:16px;">
+                <h4 style="font-size:0.9rem;margin-bottom:10px;">💡 How to Improve</h4>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                    <div style="display:flex;align-items:flex-start;gap:10px;">
+                        <span style="font-size:1rem;">🌙</span>
+                        <span style="font-size:0.82rem;color:var(--text-muted);">Aim for 7–9 hours of quality sleep to boost mood stability.</span>
+                    </div>
+                    <div style="display:flex;align-items:flex-start;gap:10px;">
+                        <span style="font-size:1rem;">🧘</span>
+                        <span style="font-size:0.82rem;color:var(--text-muted);">10 minutes of daily mindfulness significantly reduces cortisol levels.</span>
+                    </div>
+                    <div style="display:flex;align-items:flex-start;gap:10px;">
+                        <span style="font-size:1rem;">📝</span>
+                        <span style="font-size:0.82rem;color:var(--text-muted);">Regular voice journaling improves emotional self-awareness by 40%.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <button class="btn btn-glass" onclick="navigate('78-emotional-analytics')">📊 View History</button>
+                <button class="btn btn-primary" onclick="navigate('75-wellness-planner')">📋 Improve Score</button>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             VIEW 73: VOICE JOURNAL & EMOTIONAL ANALYSIS
+        ═══════════════════════════════════════════════════════════ -->
+        <div id="view-73-voice-journal" class="view">
+            <div class="header">
+                <button class="back-btn" onclick="navigate('50-profile-settings')">←</button>
+                <h2>Voice Journal</h2>
+                <div></div>
+            </div>
+
+            <!-- Recording Section -->
+            <div class="glass-card mb-4 text-center" style="padding:24px 16px;background:linear-gradient(135deg,rgba(24,112,244,0.06),rgba(255,133,45,0.04));">
+                <p class="text-muted" style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:16px;">NEW ENTRY</p>
+                <button class="journal-record-btn" id="journal-record-btn">🎙</button>
+                <p id="journal-record-status" class="text-muted" style="font-size:0.82rem;">Tap the mic to start recording your thoughts</p>
+                <div id="journal-transcript-display" class="mt-2" style="font-style:italic;font-size:0.85rem;color:var(--text-main);min-height:20px;padding:0 10px;line-height:1.5;"></div>
+                <div id="journal-emotion-result" class="mt-3" style="display:none;"></div>
+                <div id="journal-insight-text" class="mt-3" style="display:none;background:rgba(24,112,244,0.06);border-radius:12px;padding:12px;font-size:0.82rem;color:var(--text-muted);text-align:left;line-height:1.5;"></div>
+                <button id="journal-save-btn" class="btn btn-primary mt-3" style="display:none;">💾 Save Journal Entry</button>
+            </div>
+
+            <!-- Past Entries -->
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                <h4 style="font-size:0.95rem;">Past Entries</h4>
+                <span class="text-muted" style="font-size:0.78rem;" id="journal-count-label">0 entries</span>
+            </div>
+            <div id="journal-entries-list">
+                <!-- Rendered by NW_VoiceJournal.renderEntries() -->
+                <div class="text-center" style="padding:40px 20px;color:var(--text-muted);">
+                    <div style="font-size:2.5rem;margin-bottom:12px;">📖</div>
+                    <p style="font-size:0.9rem;">No journal entries yet.<br>Tap the mic to record your first entry.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             VIEW 74: BURNOUT DETECTION ENGINE
+        ═══════════════════════════════════════════════════════════ -->
+        <div id="view-74-burnout-detector" class="view">
+            <div class="header">
+                <button class="back-btn" onclick="navigate('29-insights-overview')">←</button>
+                <h2>Burnout Detector</h2>
+                <div></div>
+            </div>
+
+            <!-- Alert Banner (hidden by default) -->
+            <div id="burnout-alert-banner" style="display:none;margin-bottom:16px;">
+                <div class="crisis-banner" style="background:linear-gradient(135deg,#f59e0b,#d97706);">
+                    <h3>⚠️ Elevated Burnout Risk Detected</h3>
+                    <p>Your patterns suggest significant emotional exhaustion. Please prioritize recovery activities today.</p>
+                    <button class="btn" style="margin-top:12px;background:white;color:#d97706;font-weight:700;padding:10px 20px;border-radius:20px;border:none;font-size:0.85rem;" onclick="navigate('75-wellness-planner')">View Recovery Plan</button>
+                </div>
+            </div>
+
+            <div class="glass-card mb-4 text-center" style="padding:24px 16px;">
+                <p class="text-muted" style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:12px;">BURNOUT RISK GAUGE</p>
+                <div id="burnout-gauge-container">
+                    <!-- Rendered by NW_BurnoutDetector.renderGauge() -->
+                    <div class="shimmer" style="height:110px;width:200px;margin:0 auto;border-radius:50% 50% 0 0;"></div>
+                </div>
+                <h3 id="burnout-risk-label" style="font-size:1.2rem;font-weight:700;margin-top:12px;color:#10b981;">Low Risk</h3>
+                <p class="text-muted" style="font-size:0.8rem;margin-top:4px;">Based on your last 7 days of data</p>
+            </div>
+
+            <div class="glass-card mb-4" style="padding:16px;">
+                <h4 style="font-size:0.9rem;margin-bottom:12px;">🔍 Risk Factors</h4>
+                <div id="burnout-factors-list">
+                    <div class="shimmer" style="height:44px;margin-bottom:8px;"></div>
+                    <div class="shimmer" style="height:44px;margin-bottom:8px;"></div>
+                    <div class="shimmer" style="height:44px;"></div>
+                </div>
+            </div>
+
+            <div class="glass-card mb-4" style="padding:16px;">
+                <h4 style="font-size:0.9rem;margin-bottom:12px;">💊 Recovery Recommendations</h4>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    <div style="display:flex;align-items:flex-start;gap:10px;padding:10px;background:rgba(16,185,129,0.06);border-radius:12px;">
+                        <span style="font-size:1rem;">🌙</span>
+                        <span style="font-size:0.8rem;color:var(--text-muted);">Prioritize 8+ hours of sleep for the next 5 consecutive nights.</span>
+                    </div>
+                    <div style="display:flex;align-items:flex-start;gap:10px;padding:10px;background:rgba(24,112,244,0.06);border-radius:12px;">
+                        <span style="font-size:1rem;">🚫</span>
+                        <span style="font-size:0.8rem;color:var(--text-muted);">Establish "no-work" boundaries after 7 PM for cognitive decompression.</span>
+                    </div>
+                    <div style="display:flex;align-items:flex-start;gap:10px;padding:10px;background:rgba(139,92,246,0.06);border-radius:12px;">
+                        <span style="font-size:1rem;">🧘</span>
+                        <span style="font-size:0.8rem;color:var(--text-muted);">Daily 15-minute mindfulness sessions reduce burnout risk by up to 45%.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <button class="btn btn-glass" onclick="navigate('48-breathing-exercise')">🌬️ Breathing Reset</button>
+                <button class="btn btn-primary" onclick="navigate('75-wellness-planner')">📋 Recovery Plan</button>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             VIEW 75: PERSONALIZED WELLNESS PLANNER
+        ═══════════════════════════════════════════════════════════ -->
+        <div id="view-75-wellness-planner" class="view">
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Wellness Planner</h2>
+                <div></div>
+            </div>
+
+            <div class="glass-card mb-4" style="background:linear-gradient(135deg,#1870F4,#FF852D);padding:20px;color:white;text-align:center;">
+                <p style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:0.85;margin-bottom:6px;">TODAY'S PLAN</p>
+                <h3 style="font-size:1.1rem;margin-bottom:4px;" id="planner-date-display">Loading...</h3>
+                <p style="font-size:0.78rem;opacity:0.85;">AI-generated for your wellness score of <strong id="planner-wellness-score">—</strong></p>
+                <script>
+                    (function(){
+                        const el = document.getElementById('planner-date-display');
+                        if(el) el.textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+                    })();
+                </script>
+            </div>
+
+            <h4 style="font-size:0.95rem;margin-bottom:14px;font-weight:700;">📅 Your Day at a Glance</h4>
+            <div id="planner-slots-container">
+                <!-- Rendered by NW_WellnessPlanner.render() -->
+                <div class="shimmer" style="height:68px;margin-bottom:14px;border-radius:16px;"></div>
+                <div class="shimmer" style="height:68px;margin-bottom:14px;border-radius:16px;"></div>
+                <div class="shimmer" style="height:68px;margin-bottom:14px;border-radius:16px;"></div>
+                <div class="shimmer" style="height:68px;margin-bottom:14px;border-radius:16px;"></div>
+                <div class="shimmer" style="height:68px;border-radius:16px;"></div>
+            </div>
+
+            <div class="glass-card mt-4 mb-4" style="padding:14px;background:rgba(24,112,244,0.04);">
+                <p style="font-size:0.78rem;color:var(--text-muted);text-align:center;line-height:1.5;">
+                    🤖 This plan is personalized daily based on your emotional state and biometric data. Complete each activity to improve your Wellness Score.
+                </p>
+            </div>
+
+            <button class="btn btn-primary w-100" onclick="navigate('73-voice-journal')">🎙️ Start Voice Journal</button>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             VIEW 76: EMOTION-BASED MUSIC THERAPY
+        ═══════════════════════════════════════════════════════════ -->
+        <div id="view-76-music-therapy" class="view">
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Music Therapy</h2>
+                <div></div>
+            </div>
+
+            <div class="glass-card mb-4" style="padding:16px;background:linear-gradient(135deg,rgba(102,126,234,0.08),rgba(118,75,162,0.04));">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                    <h4 style="font-size:0.9rem;">🎯 Current Mood State</h4>
+                    <span class="nw-tooltip" id="music-mood-label">Analyzing...</span>
+                </div>
+                <p class="text-muted" style="font-size:0.78rem;line-height:1.4;">AI-matched playlists based on your biometric and emotional patterns. Scientifically curated for maximum therapeutic effect.</p>
+            </div>
+
+            <h4 style="font-size:0.9rem;margin-bottom:12px;font-weight:700;">✨ Recommended For You</h4>
+            <div id="music-recommended-list">
+                <!-- Rendered by NW_MusicTherapy.render() -->
+                <div class="shimmer" style="height:80px;margin-bottom:12px;border-radius:18px;"></div>
+                <div class="shimmer" style="height:80px;margin-bottom:12px;border-radius:18px;"></div>
+                <div class="shimmer" style="height:80px;border-radius:18px;"></div>
+            </div>
+
+            <h4 style="font-size:0.9rem;margin:20px 0 12px;font-weight:700;">🎵 All Playlists</h4>
+            <div id="music-all-list">
+                <!-- Rendered by NW_MusicTherapy.renderAll() -->
+            </div>
+
+            <div class="glass-card mt-2" style="padding:14px;border-left:4px solid var(--primary);background:rgba(24,112,244,0.04);">
+                <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.4;">
+                    🔬 <strong>Research Note:</strong> Music therapy reduces cortisol levels by up to 65%, improves REM sleep quality, and can boost serotonin production within 15 minutes of listening.
+                </p>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             VIEW 77: EMERGENCY SOS & CRISIS SUPPORT
+        ═══════════════════════════════════════════════════════════ -->
+        <div id="view-77-sos-support" class="view">
+            <div class="header">
+                <button class="back-btn" onclick="navigate('16-dashboard-main')">←</button>
+                <h2>Crisis Support</h2>
+                <div></div>
+            </div>
+
+            <div class="crisis-banner">
+                <div style="font-size:2rem;margin-bottom:10px;">🆘</div>
+                <h3>You Are Not Alone</h3>
+                <p>Help is always available. Choose a support option below — we're here with you every step of the way.</p>
+            </div>
+
+            <!-- Emergency Breathing Quick Action -->
+            <div class="glass-card mb-4" style="padding:16px;border:2px solid rgba(239,68,68,0.2);cursor:pointer;" onclick="navigate('48-breathing-exercise')">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="font-size:2rem;">🌬️</div>
+                    <div>
+                        <p style="font-weight:700;font-size:0.9rem;margin-bottom:2px;">Emergency Calm — Start Now</p>
+                        <p class="text-muted" style="font-size:0.78rem;">4-7-8 breathing exercise · Reduces acute anxiety in 60 seconds</p>
+                    </div>
+                    <span style="margin-left:auto;font-size:1.2rem;">›</span>
+                </div>
+            </div>
+
+            <h4 style="font-size:0.9rem;margin-bottom:12px;font-weight:700;">📞 Support Resources</h4>
+            <div id="sos-resources-list">
+                <!-- Rendered by NW_SOS.render() -->
+                <div class="shimmer" style="height:64px;margin-bottom:12px;border-radius:16px;"></div>
+                <div class="shimmer" style="height:64px;margin-bottom:12px;border-radius:16px;"></div>
+                <div class="shimmer" style="height:64px;border-radius:16px;"></div>
+            </div>
+
+            <!-- Safety Affirmations -->
+            <div class="glass-card mt-4" style="padding:18px;background:linear-gradient(135deg,rgba(24,112,244,0.05),rgba(16,185,129,0.05));text-align:center;">
+                <p style="font-size:1.1rem;font-weight:500;color:var(--text-main);line-height:1.6;font-style:italic;">"This too shall pass. You have survived every difficult moment so far. Your strength is real."</p>
+                <p class="text-muted" style="font-size:0.75rem;margin-top:8px;">— NeuroWell AI Crisis Support</p>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             VIEW 78: WEEKLY & MONTHLY EMOTIONAL ANALYTICS
+        ═══════════════════════════════════════════════════════════ -->
+        <div id="view-78-emotional-analytics" class="view">
+            <div class="header">
+                <button class="back-btn" onclick="navigate('29-insights-overview')">←</button>
+                <h2>Emotional Analytics</h2>
+                <div></div>
+            </div>
+
+            <!-- Period Tab Bar -->
+            <div class="analytics-tab-bar">
+                <button class="analytics-tab active" data-period="weekly"   onclick="NW_switchAnalyticsTab('weekly')">Weekly</button>
+                <button class="analytics-tab"        data-period="monthly"  onclick="NW_switchAnalyticsTab('monthly')">Monthly</button>
+                <button class="analytics-tab"        data-period="quarterly" onclick="NW_switchAnalyticsTab('quarterly')">3 Months</button>
+            </div>
+
+            <!-- Bar Chart -->
+            <div class="glass-card mb-4" style="padding:16px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                    <h4 style="font-size:0.9rem;">Wellness Score Trend</h4>
+                    <span id="analytics-trend-badge" style="font-size:0.8rem;font-weight:700;color:var(--primary);">Stable</span>
+                </div>
+                <div id="analytics-bar-chart">
+                    <!-- Rendered by NW_Analytics.renderBarChart() -->
+                    <div class="shimmer" style="height:120px;border-radius:10px;margin-bottom:8px;"></div>
+                </div>
+            </div>
+
+            <!-- Key Metrics -->
+            <div class="glass-card mb-4" style="padding:16px;">
+                <h4 style="font-size:0.9rem;margin-bottom:12px;">📈 Key Metrics</h4>
+                <div id="analytics-metrics-container">
+                    <div class="shimmer" style="height:36px;margin-bottom:8px;"></div>
+                    <div class="shimmer" style="height:36px;margin-bottom:8px;"></div>
+                    <div class="shimmer" style="height:36px;margin-bottom:8px;"></div>
+                    <div class="shimmer" style="height:36px;"></div>
+                </div>
+            </div>
+
+            <!-- Mood Heatmap Summary -->
+            <div class="glass-card mb-4" style="padding:16px;">
+                <h4 style="font-size:0.9rem;margin-bottom:12px;">🗓 Emotion Distribution</h4>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <span class="insight-chip" style="background:rgba(16,185,129,0.12);color:#10b981;">😊 Joy 32%</span>
+                    <span class="insight-chip" style="background:rgba(24,112,244,0.12);color:#1870F4;">😌 Calm 28%</span>
+                    <span class="insight-chip" style="background:rgba(245,158,11,0.12);color:#f59e0b;">😐 Neutral 22%</span>
+                    <span class="insight-chip" style="background:rgba(139,92,246,0.12);color:#8b5cf6;">😔 Sad 10%</span>
+                    <span class="insight-chip" style="background:rgba(239,68,68,0.12);color:#ef4444;">😟 Anxious 8%</span>
+                </div>
+            </div>
+
+            <!-- AI Insights -->
+            <div style="margin-bottom:8px;">
+                <h4 style="font-size:0.9rem;margin-bottom:12px;">🤖 AI-Generated Insights</h4>
+                <div id="analytics-insights-container">
+                    <div class="shimmer" style="height:60px;margin-bottom:8px;border-radius:12px;"></div>
+                    <div class="shimmer" style="height:60px;border-radius:12px;"></div>
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;">
+                <button class="btn btn-glass" onclick="navigate('74-burnout-detector')">🔥 Burnout Risk</button>
+                <button class="btn btn-primary" onclick="navigate('75-wellness-planner')">📋 Action Plan</button>
+            </div>
+        </div>
+
+        <script src="features.js"></script>
+        <script src="app.js"></script>
+    <script type="module" src="firebase-main.js"></script>
+</body>
+
+</html>
