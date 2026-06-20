@@ -537,7 +537,7 @@ window.NW_SOS = {
         } else if (action.startsWith('tel:')) {
             window.location.href = action;
         } else if (action.startsWith('url:')) {
-            window.open(action.split('url:')[1], '_blank');
+            window.location.href = action.split('url:')[1];
         }
     },
 
